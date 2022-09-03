@@ -1,0 +1,38 @@
+shiro整合boot运行时出现shiroFilterFactoryBean错误。本质原因时在重写ShiroFilterFactoryBean方法时的问题
+下面时我当时遇到问题的代码。
+ @Bean
+    public ShiroFilterFactoryBean  getShiroFilterFactoryBean(@Qualifier("security") DefaultWebSecurityManager defaultWebSecurityManager){
+        ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
+        bean.setSecurityManager(defaultWebSecurityManager);
+        return bean;
+    }
+    这的问题时 getShiroFilterFactoryBean方法名不是shiro固定扫描的名字，这时导致报错的原因。
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Method filterShiroFilterRegistrationBean in org.apache.shiro.spring.config.web.autoconfigure.ShiroWebFilterConfiguration required a bean named 'shiroFilterFactoryBean' that could not be found.
+
+
+Action:
+
+Consider defining a bean named 'shiroFilterFactoryBean' in your configuration.    
+    
+
+解决：
+第一种：使用 shiroFilterFactoryBea默认的方法名
+ @Bean
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("security") DefaultWebSecurityManager defaultWebSecurityManager){
+        ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
+        bean.setSecurityManager(defaultWebSecurityManager);
+        return bean;
+    }
+第二种： 利用@Bean托管的特点，给方法设置别名
+ @Bean(name="shiroFilterFactoryBean")或者("shiroFilterFactoryBean")
+    public ShiroFilterFactoryBean getShiroFilterFactoryBean(@Qualifier("security") DefaultWebSecurityManager defaultWebSecurityManager){
+        ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
+        bean.setSecurityManager(defaultWebSecurityManager);
+        return bean;
+    }
